@@ -78,6 +78,7 @@ async def get_expenses(user: tables.User = Depends(get_user),
                        service: ExpensesService = Depends(ExpensesService),
                        dates_range=Depends(get_dates_range_params),
                        is_expense: bool | None = Query(None),
+                       category: str | None = Query(None),
                        limit: int | None = Query(None, gt=0),
                        sort_by: str = Query("date"),
                        asc: bool | None = Query(True)):
@@ -86,6 +87,7 @@ async def get_expenses(user: tables.User = Depends(get_user),
                             limit=limit,
                             sort_by=sort_by,
                             asc=asc,
+                            category=category,
                             **dates_range)
 
 

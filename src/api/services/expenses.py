@@ -26,15 +26,19 @@ class ExpensesService:
                         user_id: int,
                         date_from: dt.date,
                         date_to: dt.date,
+                        is_expense: bool = None,
+                        category: str = None,
                         limit: int = None,
                         sort_by: str = "date",
-                        asc: bool = True,
-                        is_expense: bool = None):
+                        asc: bool = True):
         q = (self.session.query(Expense)
              .join(Expense.category)
              .filter(Expense.user_id == user_id)
              .filter(Expense.date.between(date_from, date_to))
              .filter(Expense.category_id.notin_(settings.exclude_categories)))
+
+        if category is not None:
+            q = q.filter(Category.name == category)
 
         if is_expense is not None:
             q = q.filter(Expense.is_expense == is_expense)
