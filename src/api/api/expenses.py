@@ -13,6 +13,7 @@ from .. import tables
 from ..models.expenses import (
     Expense,
     AggregatedExpense,
+    Summary,
 )
 from ..services.expenses import ExpensesService
 from ..services.users import get_user
@@ -105,3 +106,9 @@ async def get_aggregated_expenses(user: tables.User = Depends(get_user),
                                   is_expense=is_expense,
                                   **dates_range,
                                   **sorting_param)
+
+
+@router.get("/users/{user_id}/summary", response_model=Summary)
+async def get_summary(dates_range: dict = Depends(get_dates_range_params),
+                      service: ExpensesService = Depends(ExpensesService)):
+    return service.get_summary(**dates_range)

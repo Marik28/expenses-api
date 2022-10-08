@@ -2,6 +2,7 @@ import datetime as dt
 
 import pandas as pd
 from fastapi import Depends
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..database import get_session
@@ -75,3 +76,18 @@ class ExpensesService:
             df = df.sort_values(by=sort_by, ascending=asc)
 
         return df.reset_index().to_dict("list")
+
+    def _get_summary_query(self, expenses: bool, date_from: dt.datetime = None, date_to: dt.datetime = None):
+        q = (self.session
+             .query(func.sum(Expense.amount).label("sum"))
+             .filter(Expense.is_expense.is_(expenses)))
+        if date_from and date_to:
+            q = q.filter(Expense.date.between(date_from, date_to))
+
+        return q
+
+    def get_summary(self, date_from: dt.datetime = None, date_to: dt.datetime = None):
+        revenue = self._get_summary_query(expenses=False, date_from=date_from, date_to=date_to)
+        expenses = self._get_summary_query(expenses=True, date_from=date_from, date_to=date_to)
+        result = revenue.union(expenses).all()
+        return {"revenue": result[1][0], "expenses": result[0][0]}

@@ -18,3 +18,8 @@ class AggregatedExpense(BaseOrmModel):
     amount: list[Decimal]
     date: list[dt.date] | None
     category: list[str] | None
+
+
+class Summary(BaseOrmModel):
+    revenue: Decimal
+    expenses: Decimal
